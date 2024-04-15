@@ -1,0 +1,267 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+
+    <style>
+        /* Custom CSS for the registration page */
+        body {
+            background-color: #f0f0f0;
+            background-image: url('https://ehospital.gov.in/ehospitalsso/assets/assets_new_login/img/abha1-1.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .registration {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bg-image {
+            background-image: url('https://ehospital.gov.in/ehospitalsso/assets/assets_new_login/img/abha1-1.jpg'); /* Update the background image URL */
+            background-size: cover;
+            background-position: center;
+            height: 100%;
+        }
+
+        .registration-heading {
+            font-weight: 300;
+            color: #333;
+        }
+
+        /* Custom styles for the registration form */
+        .registration-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px; /* Increase the form width as needed */
+            width: 100%; /* Ensure the form takes the full available width */
+        }
+
+        /* Style for error messages */
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="registration">
+            <div class="registration-form">
+                <h3 class="registration-heading mb-4">Patient Registration</h3>
+
+                <!-- Registration Form -->
+                <form action="#" id="userregistrationform" method="POST" onsubmit="return validateRegistrationForm()">
+                    {% csrf_token %}
+                    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+                        <div id="email-toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="me-auto">Email Error</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Email already exists.
+                            </div>
+                        </div>
+
+                        <div id="username-toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="me-auto">Username Error</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Username already exists.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required oninput="validateUsername()">
+                        <div class="error-message" id="username-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="firstname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstname" name="firstname" required oninput="validateName(this, 'firstNameError')">
+                        <div class="error-message" id="firstNameError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastname" name="lastname" required oninput="validateName(this, 'lastNameError')">
+                        <div class="error-message" id="lastNameError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dob">Date of birth:</label>
+                        <input type="date" placeholder="Select DOB" name="dob" id="dob" value="1990-01-01" max="{{ current_date }}" onchange="setDateMax()">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required oninput="validateEmail()">
+                        <div class="error-message" id="email-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required oninput="validatePassword()">
+                        <div class="error-message" id="password-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required oninput="validateConfirmPassword()">
+                        <div class="error-message" id="confirmPassword-error"></div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-lg btn-primary text-uppercase fw-bold mb-2" type="submit">Register</button>
+                    </div>
+                </form>
+                <div class="alert alert-success" id="registration-success" style="display: none;">
+                    Registered Successfully!
+                </div>
+                <p class="login">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Validation functions
+        function validateUsername() {
+            const usernameInput = document.getElementById("username");
+            const usernameError = document.getElementById("username-error");
+
+            // Validation for username
+            // Example: Username should be alphanumeric and have at least 5 characters.
+            const isValid = /^[a-zA-Z0-9]{5,}$/.test(usernameInput.value);
+
+            if (!isValid) {
+                usernameError.textContent = "Username should be alphanumeric and have at least 5 characters.";
+            } else {
+                usernameError.textContent = "";
+            }
+        }
+
+        function setDateMax() {
+            const dobInput = document.getElementById("dob");
+            const currentDate = new Date().toISOString().split("T")[0];
+            dobInput.max = currentDate;
+        }
+
+        function validateName(inputElement, errorId) {
+            const namePattern = /^[A-Z][a-zA-Z\s]*$/; // First letter capital, alphabetic characters, and spaces
+            const inputValue = inputElement.value.trim();
+            const errorElement = document.getElementById(errorId);
+
+            if (inputValue === "") {
+                errorElement.textContent = "This field should not be blank";
+            } else if (!namePattern.test(inputValue)) {
+                errorElement.textContent = "Only alphabetic characters and spaces are allowed, and the first letter should be capital";
+            } else {
+                errorElement.textContent = "";
+            }
+        }
+
+        function validateEmail() {
+            const emailInput = document.getElementById("email");
+            const emailError = document.getElementById("email-error");
+
+            // Updated email validation pattern to allow specific extensions
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|ajce\.in|yahoo\.com)$/;
+
+            const isValid = emailPattern.test(emailInput.value);
+
+            if (!isValid) {
+                emailError.textContent = "Please enter a valid email address with extensions @gmail.com, @ajce.in, @yahoo.com.";
+            } else {
+                emailError.textContent = "";
+            }
+        }
+
+        function validatePassword() {
+            const passwordInput = document.getElementById("password");
+            const passwordError = document.getElementById("password-error");
+
+            // Validation for password
+            // Example: Password should have at least 8 characters and contain at least one number and one special character.
+            const isValid = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/.test(passwordInput.value);
+
+            if (!isValid) {
+                passwordError.textContent = "Password should have at least 8 characters and contain at least one number and one special character.";
+            } else {
+                passwordError.textContent = "";
+            }
+        }
+
+        function validateConfirmPassword() {
+            const passwordInput = document.getElementById("password");
+            const confirmPasswordInput = document.getElementById("confirmPassword");
+            const confirmPasswordError = document.getElementById("confirmPassword-error");
+
+            // Validation for confirming password
+            // Example: Check if passwords match.
+            const isValid = passwordInput.value === confirmPasswordInput.value;
+
+            if (!isValid) {
+                confirmPasswordError.textContent = "Passwords do not match.";
+            } else {
+                confirmPasswordError.textContent = "";
+            }
+        }
+
+        // Function to validate the registration form
+        function validateRegistrationForm() {
+            // Call individual validation functions here and return true if all are valid
+            const isUsernameValid = /^[a-zA-Z0-9]{5,}$/.test(document.getElementById("username").value);
+            const isFirstnameValid = /^[A-Z][a-zA-Z\s]*$/.test(document.getElementById("firstname").value.trim());
+            const isLastnameValid = /^[A-Z][a-zA-Z\s]*$/.test(document.getElementById("lastname").value.trim());
+            const isEmailValid = /^[a-zA-Z0-9._%+-]+@(gmail\.com|ajce\.in|yahoo\.com)$/.test(document.getElementById("email").value);
+            const isPasswordValid = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/.test(document.getElementById("password").value);
+            const isConfirmPasswordValid = document.getElementById("password").value === document.getElementById("confirmPassword").value;
+
+            // You can add more validation checks as needed
+
+            // Check if all validations are true
+            const isFormValid = isUsernameValid && isFirstnameValid && isLastnameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid;
+
+            // If the form is valid, show the success message and return true
+            if (isFormValid) {
+                // Show the success message
+                const successMessage = document.getElementById("registration-success");
+                successMessage.style.display = "block";
+
+                return true; // Allow form submission
+            }
+
+            // If the form is not valid, return false to prevent form submission
+            return false;
+        }
+
+        // ... (your existing showSuccessToast function and other parts of the script)
+ 
+        //function showSuccessToast() {
+          //  const successMessage = document.getElementById("registration-success");
+          //  successMessage.style.display = "block";
+
+         //   setTimeout(function () {
+        //        successMessage.style.display = "none";
+         //   }, 3000);
+       // }
+
+        // Check if the registration success message is present in the template
+        const successMessage = document.getElementById("registration-success");
+        if (successMessage && successMessage.textContent.trim() !== "") {
+            showSuccessToast();
+        }
+
+        function setDateMax() {
+            const currentDate = new Date().toISOString().split("T")[0];
+            document.getElementById("dob").max = currentDate;
+        }
+
+    </script>
+</body>
+</html>

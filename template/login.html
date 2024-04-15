@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        /* Add the styles from the second code here */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('https://ehospital.gov.in/ehospitalsso/assets/assets_new_login/img/abha1-1.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .background-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-container h1 {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .login-form button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .signup {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .google-signin {
+            background-color: red;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .home-button {
+            text-align: center;
+            margin-top: 10px; /* Add spacing between "Don't have an account?" and the home button */
+        }
+
+        .home-button a {
+            display: inline-block;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            /* Add more styling as needed */
+        }
+        
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .toast.success {
+            background-color: #28a745;
+        }
+
+        .toast.error {
+            background-color: #dc3545;
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                width: 95%;
+            }
+        }
+
+        .google-logo {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px; /* Adjust the size as needed */
+            font-weight: bold;
+            color: #4285F4; /* Google logo blue color */
+            margin-right: 10px; /* Adjust spacing as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="login-container">
+            <h1>LOGIN</h1>
+
+            <form class="login-form" method="POST" action="{% url 'login' %}" id="login-form">
+                {% csrf_token %}
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <span id="email-error" class="error-message"></span> <!-- Use 'email' here -->
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <span id="password-error" class="error-message"></span>
+                <button type="submit">Login</button>
+            </form>
+            <div id="inactive-account-message" class="toast error" style="display: none;">Your account is inactive. Please contact support.</div>
+            <p class="forgot-password"><a href="{% url 'forget_password' %}">Forgot your password?</a></p>
+            <p class="signup">Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+            {% comment %} <a class="google-signin" href="{% url 'social:begin' 'google-oauth2' %}">
+                <span class="google-logo">G</span> Google Signin
+            </a>  {% endcomment %}
+            <div class="home-button">
+                <a href="{% url 'index' %}" title="Home">Home</a>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% if success_message %}
+        <ul class="messages">
+            <li class="success">{{ success_message }}</li>
+        </ul>
+        {% endif %}
+    </div>
+    
+    <script>
+        const messages = document.querySelectorAll('.messages li');
+        const inactiveMessage = document.getElementById('inactive-account-message');
+    
+        messages.forEach(function (message) {
+            const messageText = message.textContent;
+            const messageClass = message.getAttribute('class');
+    
+            if (messageClass === 'success') {
+                showToast(messageText, 'success');
+            } else if (messageClass === 'error') {
+                showToast(messageText, 'error');
+            }
+        });
+    
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.querySelector('.toast-container').appendChild(toast);
+    
+            setTimeout(function () {
+                toast.style.opacity = '1';
+            }, 100);
+    
+            setTimeout(function () {
+                toast.style.opacity = '0';
+            }, 3000);
+    
+            setTimeout(function () {
+                toast.remove();
+            }, 3500);
+        }
+    
+        // Check for the inactive account message and display it
+        if (inactiveMessage.style.display !== 'none') {
+            showToast(inactiveMessage.textContent, 'error');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>AllergyCare</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">  
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        body {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .background {
+            /* background-image: url("{% static 'img/profile.jpg' %}");*/ /* Replace 'profile.jpg' with your image file */
+            background-size: cover;
+            background-position: center;
+            filter: blur(5px); /* Adjust the blur amount as needed */
+            -webkit-filter: blur(5px); /* For older browsers */
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0; /* Place it behind all other content */
+            opacity: 0.7; /* Adjust the opacity as needed */
+        }
+        
+        /* Style for the card container */
+        .card-container {
+            background-color: rgba(255, 255, 255, 0.9); /* Adjust the background color and opacity */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the form within the card */
+        .profile-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Style for the update profile button */
+        .btn-update-profile {
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .btn-update-profile:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+
+    <!-- Navbar Start -->
+    <div class="container-fluid sticky-top bg-white shadow-sm" style="z-index: 1;">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
+                <a href="index.html" class="navbar-brand">
+                    <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-clinic-medical me-2"></i>AllergyCare</h1>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto py-0">
+                        <a href="{% url 'allergy_types' %}" class="nav-item nav-link active">Back</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-primary py-5 mb-5 hero-header">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card card-container">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="mb-0">Food Allergy Types</h2>
+                        </div>
+                        <div class="card-body profile-form">
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6 text-center">
+                                        <img src="https://media.post.rvohealth.io/wp-content/uploads/2020/09/The_8_Most_Common_Food_Allergies-732x549-thumbnail.jpg" alt="Food Allergy" class="img-fluid">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h3>Food Allergies</h3>
+                                        <p>What would you do if you were told that you can’t eat your favourite dish anymore because you’re allergic to it? It’s a hard choice.
+
+                                            According to the Centers for Disease Control and Prevention, food allergies are estimated to affect 4% - 6% of children and 4% of adults.
+                                            
+                                            A food allergy occurs when your immune system mistakes harmless food as something that can harm your body. Even the tiniest morsel of an allergy-causing food can trigger symptoms such as digestive problems, hives, etc. Food allergy symptoms differ from person to person. One can develop a food allergy at any age, but food allergies in children are most common.</p>
+                                </div>
+                                <button class="btn btn-primary" onclick="showModal('pollution')">Details</button>
+                            </div><a>--------------------------------------------------------------------------------------------------------------------------------</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="allergyModal" tabindex="-1" role="dialog" aria-labelledby="allergyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="allergyModalLabel">Allergy Details</h5>
+                    {% comment %} <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button> {% endcomment %}
+                </div>
+                <div class="modal-body" id="allergyDetails">
+                    <!-- Detailed information will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showModal(allergyType) {
+            // Fetch detailed information based on allergy type and populate modal
+            // You can use AJAX to fetch data from the server or directly embed it here
+            let details = '';
+            if (allergyType === 'pollution') {
+                details = `<h4>Food Allergies</h4>
+                           <p>
+                            What is the difference between food allergy and food intolerance?
+Many food intolerances are often mistaken for food allergies. Food intolerance can cause the same signs and symptoms as a food allergy which makes it difficult to differentiate between the two.
+
+Food intolerance never involves the immune system. When you eat spicy food, you get a runny nose and if you’re lactose intolerant, eating dairy products leads to diarrhoea. This is your body’s way of reacting to food that can harm you. This isn’t caused by your immune system, so it’s not an allergy. There are several causes for food intolerance such as irritable bowel syndrome, recurring stress or psychological factors, celiac disease, absence of enzyme needed to digest food and sensitivity to certain food additives.
+
+A food allergy, on the other hand, causes your immune system to react and affects numerous organs in the body. An allergic food reaction can even be severe and life-threatening whereas food intolerances are often limited to digestive problems and are comparatively less severe.
+
+If you have a reaction after eating a particular food, it’s better to visit your doctor to determine whether the underlying cause is a food intolerance or an allergy.     
+                           </p>`;
+            } else if (allergyType === 'pollen') {
+                details = `<h4>Paint Allergy</h4>
+                           <p>Paint allergies! Your safest haven, your own home, has paint. Paint is everywhere around you, throughout your life – at your workplace, college, malls, multiplexes, and basically every wall. Paint allergies occur when you inhale strong vapours from paint or come in direct contact with allergens. All paints produce fumes with chemical odours in the air. Volatile organic compounds (VOCs) found in most oil-based household paints are also well-known allergens; even water-based paints can cause allergic reactions in some individuals. Besides inhalation, direct skin contact is a more frequent way of catching an allergy. Methyl methacrylate (MMA) is found in nail polish, hairsprays, textiles and even paint. With direct skin contact, MMA can cause contact irritation and allergic reactions in the skin, but it does not cause any kind of allergic reactions in the respiratory system.
+                            
+                            Triggers
+                            Exposure to vapour and VOCs from paint can result in an allergic reaction in the respiratory system. Coming in direct contact with allergens and other foreign substances present in paint can also lead to a skin allergy. In fact, direct skin contact is a more common cause of an allergy than inhalation.</p>`;
+            } else if (allergyType === 'mold') {
+                details = `<h4>What is a dust mite allergy?</h4>
+                           <p>An allergen is a substance that causes an allergic reaction. Both the body parts and the waste of dust mites are allergens for several people. Most dust mites die in low humidity levels or extreme temperatures. But they do leave waste behind. These can continue to cause allergic reactions in the body. In a warm, humid house, dust mites can survive all year round.It may sound unpleasant, but one piece of dust can contain pet dander, pet fur, feathers, pieces of dead cockroaches, mold spores, along with dead skin and dust mites. Cockroach waste, saliva, and body parts are the biggest and the most common triggers across the globe. Dust mites, also called bed mites, are the most common cause of allergy from house dust. Dust mites live and multiply easily in warm, humid places thus triggering the condition for you. They prefer temperatures at or above 70 degrees Fahrenheit or high humidity places preferably 70-80% and are inactive once the humidity falls below 50%.</p>`;
+            }
+            document.getElementById('allergyDetails').innerHTML = details;
+            $('#allergyModal').modal('show');
+        }
+    </script>
+    
+
+    <div class="container-fluid bg-dark text-light mt-5 py-5">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Get In Touch</h4>
+                    <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor</p>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>123 Street, New York, USA</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>info@example.com</p>
+                    <p class="mb-0"><i class="fa fa-phone-alt text-primary me-3"></i>+012 345 67890</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Quick Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a>
+                        <a class="text-light" href="#"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Popular Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a>
+                        <a class="text-light" href="#"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Newsletter</h4>
+                    <form action="">
+                        <div class="input-group">
+                            <input type="text" class="form-control p-3 border-0" placeholder="Your Email Address">
+                            <button class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                    <h6 class="text-primary text-uppercase mt-4 mb-3">Follow Us</h6>
+                    <div class="d-flex">
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ... (Your footer section remains the same) ... -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/moment.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/moment-timezone.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- ... (Your JavaScript library references remain the same) ... -->
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/refresh_on_back.js' %}"></script>
+</body>
+
+</html>

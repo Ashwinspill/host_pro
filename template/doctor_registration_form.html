@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset Complete</title>
+    <style>
+        /* Style the background image */
+        body {
+            background-image: url('https://ehospital.gov.in/ehospitalsso/assets/assets_new_login/img/abha1-1.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: black; /* Changed text color to black */
+            animation: fadeIn 1s ease-in-out; /* Fade-in animation on loading */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .content {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 40px; /* Increased padding to make it thicker */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 80px;
+            transition: box-shadow 0.3s ease; /* Smooth transition for box-shadow */
+        }
+
+        .content:hover {
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4); /* Glow effect on hover */
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Smooth transition for color */
+        }
+
+        a:hover {
+            color: #0056b3; /* Change color on hover */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+{% comment %} <body>
+    <div class="content">
+        <!-- provider_registration_form.html -->
+        <h1> Doctor registration</h1>
+        <form method="post" action="{% url 'doctor_registration' %}">
+            {% csrf_token %}
+            <label for="providername">Doctor Name:</label>
+            <input type="text" id="providername" name="providername" required><br> <br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body> {% endcomment %}
+
+<body>
+    <div class="content">
+        <!-- provider_registration_form.html -->
+        <h1>Doctor registration</h1>
+        <form method="post" action="{% url 'doctor_registration' %}" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="providername" class="form-label">Doctor Name:</label>
+                <input type="text" class="form-control" id="providername" name="providername" required
+                    oninput="validateDoctorName()">
+                <div class="error-message" id="providername-error">{{ form.providername.errors }}</div>
+            </div>
+            <br>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required oninput="validateEmail()">
+                <div class="error-message" id="email-error">{{ form.email.errors }}</div>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        // Validation functions
+        function validateDoctorName() {
+            const doctorNameInput = document.getElementById("providername");
+            const doctorNameError = document.getElementById("providername-error");
+
+            // Validation for doctor name
+            // Check if the first letter is capital
+            const isValid = /^[A-Z]/.test(doctorNameInput.value.trim());
+
+            if (!isValid) {
+                doctorNameError.textContent = "Doctor name should start with a capital letter.";
+            } else {
+                doctorNameError.textContent = "";
+            }
+        }
+
+        function validateEmail() {
+            const emailInput = document.getElementById("email");
+            const emailError = document.getElementById("email-error");
+
+            // Updated email validation pattern to require at least one character before .com
+            const isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[a-zA-Z]*$/.test(emailInput.value);
+
+            if (!isValid) {
+                emailError.textContent = "Please enter a valid email address.";
+            } else {
+                emailError.textContent = "";
+            }
+        }
+
+        // Function to validate the form
+        function validateForm() {
+            // Call individual validation functions here and update error messages
+            validateDoctorName();
+            validateEmail();
+
+            // Check if any error messages exist
+            const errorMessages = document.querySelectorAll(".error-message");
+            for (const errorMessage of errorMessages) {
+                if (errorMessage.textContent !== "") {
+                    return false; // Return false if there are validation errors
+                }
+            }
+
+            return true; // Return true if all validations pass
+        }
+
+        // Attach validation functions to input events
+        document.getElementById("providername").addEventListener("input", validateDoctorName);
+        document.getElementById("email").addEventListener("input", validateEmail);
+    </script>
+</body>
+
+</html>

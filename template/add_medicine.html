@@ -1,0 +1,323 @@
+{% block content %}
+<style>
+    /* Container for the sidebar and main content */
+    .container {
+        display: flex;
+        background: url('https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0zNzNiYXRjaDE1LTIxNy0wMS5qcGc.jpg') center/cover no-repeat; /* Replace with your medicine-related background image URL */
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+        width: 250px;
+        background-color: #333;
+        padding-top: 20px;
+        min-height: 100vh;
+    }
+
+    .sidebar a {
+        padding: 10px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+    }
+
+    .sidebar a:hover {
+        background-color: #007bff;
+    }
+
+    /* Main content styles */
+    .main-content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    /* Form container styles */
+    .medicine-form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+    }
+
+    /* Form title styles */
+    .form-title {
+        font-size: 24px;
+        text-align: center;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    /* Medicine form styles */
+    .medicine-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Form group styles */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    /* Submit button styles */
+    .form-submit-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .form-submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="{% url 'admind' %}" class="custom-button">Home</a>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="navbar">
+            <h1>Admin Dashboard</h1>
+        </div>
+
+        {% comment %} <!-- Medicine form container -->
+        <div class="medicine-form-container">
+            <h2 class="form-title">Add a New Medicine</h2>
+            <form method="post" enctype="multipart/form-data" class="medicine-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Medicine Name:</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.price.id_for_label }}" class="form-label">Price:</label>
+                    {{ form.price }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">Content:</label>
+                    {{ form.content }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name:</label>
+                    {{ form.company_name }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.medicine_info.id_for_label }}" class="form-label">Medicine Info:</label>
+                    {{ form.medicine_info }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.med_image.id_for_label }}" class="form-label">Medicine Image:</label>
+                    {{ form.med_image }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity:</label>
+                    {{ form.quantity }}
+                </div>
+                <button type="submit" class="form-submit-button">Add Medicine</button>
+            </form>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+<!-- Medicine form container -->
+<div class="medicine-form-container">
+    <h2 class="form-title">Add a New Medicine</h2>
+    <form method="post" enctype="multipart/form-data" class="medicine-form" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Medicine Name:</label>
+            <input type="text" class="form-control" id="{{ form.name.id_for_label }}" name="name"
+                value="{{ form.name.value }}" required oninput="validateMedicineName()">
+            <div class="error-message" id="medicine-name-error">{{ form.name.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.price.id_for_label }}" class="form-label">Price:</label>
+            <input type="text" class="form-control" id="{{ form.price.id_for_label }}" name="price"
+                value="{{ form.price.value }}" required oninput="validatePrice()">
+            <div class="error-message" id="price-error">{{ form.price.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.content.id_for_label }}" class="form-label">Content:</label>
+            <input type="text" class="form-control" id="{{ form.content.id_for_label }}" name="content"
+                value="{{ form.content.value }}" required oninput="validateContent()">
+            <div class="error-message" id="content-error">{{ form.content.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name:</label>
+            <input type="text" class="form-control" id="{{ form.company_name.id_for_label }}" name="company_name"
+                value="{{ form.company_name.value }}" required oninput="validateCompanyName()">
+            <div class="error-message" id="company-name-error">{{ form.company_name.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.medicine_info.id_for_label }}" class="form-label">Medicine Info:</label>
+            <input type="text" class="form-control" id="{{ form.medicine_info.id_for_label }}" name="medicine_info"
+                value="{{ form.medicine_info.value }}" required oninput="validateMedicineInfo()">
+            <div class="error-message" id="medicine-info-error">{{ form.medicine_info.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.med_image.id_for_label }}" class="form-label">Medicine Image:</label>
+            <input type="file" class="form-control" id="{{ form.med_image.id_for_label }}" name="med_image"
+                accept="image/*" required onchange="validateImage()"><h6>Image should be of maximum 200 X 300</h6>
+            <div class="error-message" id="image-error">{{ form.med_image.errors }}</div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity:</label>
+            <input type="number" class="form-control" id="{{ form.quantity.id_for_label }}" name="quantity"
+                value="{{ form.quantity.value }}" required oninput="validateQuantity()">
+            <div class="error-message" id="quantity-error">{{ form.quantity.errors }}</div>
+        </div>
+        <button type="submit" class="form-submit-button">Add Medicine</button>
+    </form>
+</div>
+{% endblock %}
+
+<script>
+    // Validation function for Medicine Name
+    function validateMedicineName() {
+        const medicineNameInput = document.getElementById("{{ form.name.id_for_label }}");
+        const medicineNameError = document.getElementById("medicine-name-error");
+
+        // Check if the first letter is capital
+        const isValid = /^[A-Z]/.test(medicineNameInput.value.trim());
+
+        if (!isValid) {
+            medicineNameError.textContent = "Medicine name should start with a capital letter.";
+        } else {
+            medicineNameError.textContent = "";
+        }
+    }
+
+    // Validation function for Price
+    function validatePrice() {
+        const priceInput = document.getElementById("{{ form.price.id_for_label }}");
+        const priceError = document.getElementById("price-error");
+
+        // Validate if the input is a numeric value (may include decimals)
+        const isValid = /^[0-9]+(\.[0-9]+)?$/.test(priceInput.value.trim());
+
+        if (!isValid) {
+            priceError.textContent = "Price should be a numeric value.";
+        } else {
+            priceError.textContent = "";
+        }
+    }
+
+    // Validation function for Content
+    function validateContent() {
+        const contentInput = document.getElementById("{{ form.content.id_for_label }}");
+        const contentError = document.getElementById("content-error");
+
+        // Validate content if needed
+        // For example: alphanumeric validation
+        const isValid = /^[a-zA-Z0-9\s]+$/.test(contentInput.value.trim());
+
+        if (!isValid) {
+            contentError.textContent = "Content should be alphanumeric.";
+        } else {
+            contentError.textContent = "";
+        }
+    }
+
+    // Validation function for Company Name
+    function validateCompanyName() {
+        const companyNameInput = document.getElementById("{{ form.company_name.id_for_label }}");
+        const companyNameError = document.getElementById("company-name-error");
+
+        // Check if the first letter is capital
+        const isValid = /^[A-Z]/.test(companyNameInput.value.trim());
+
+        if (!isValid) {
+            companyNameError.textContent = "Company name should start with a capital letter.";
+        } else {
+            companyNameError.textContent = "";
+        }
+    }
+
+    // Validation function for Medicine Info
+    function validateMedicineInfo() {
+        const medicineInfoInput = document.getElementById("{{ form.medicine_info.id_for_label }}");
+        const medicineInfoError = document.getElementById("medicine-info-error");
+
+        // Validate if the input is not empty
+        const isValid = medicineInfoInput.value.trim() !== "";
+
+        if (!isValid) {
+            medicineInfoError.textContent = "Medicine info is required.";
+        } else {
+            medicineInfoError.textContent = "";
+        }
+    }
+
+    // Validation function for Image
+    function validateImage() {
+        const fileInput = document.getElementById("{{ form.med_image.id_for_label }}");
+        const imageError = document.getElementById("image-error");
+
+        // Validate if the input is an image file
+        const isValid = fileInput.files.length > 0 && fileInput.files[0].type.startsWith("image/");
+
+        if (!isValid) {
+            imageError.textContent = "Please select a valid image file.";
+        } else {
+            imageError.textContent = "";
+        }
+    }
+
+    // Validation function for Quantity
+    function validateQuantity() {
+        const quantityInput = document.getElementById("{{ form.quantity.id_for_label }}");
+        const quantityError = document.getElementById("quantity-error");
+
+        // Validate if the input is a numeric value
+        const isValid = /^[0-9]+$/.test(quantityInput.value.trim());
+
+        if (!isValid) {
+            quantityError.textContent = "Quantity should be a number.";
+        } else {
+            quantityError.textContent = "";
+        }
+    }
+
+    // Function to validate the form
+    function validateForm() {
+        // Call individual validation functions here and update error messages
+        validateMedicineName();
+        validatePrice();
+        validateContent();
+        validateCompanyName();
+        validateMedicineInfo();
+        validateImage();
+        validateQuantity();
+
+        // Check if any error messages exist
+        const errorMessages = document.querySelectorAll(".error-message");
+        for (const errorMessage of errorMessages) {
+            if (errorMessage.textContent !== "") {
+                return false; // Return false if there are validation errors
+            }
+        }
+
+        return true; // Return true if all validations pass
+    }
+
+    // Attach validation functions to input events
+    document.getElementById("{{ form.name.id_for_label }}").addEventListener("input", validateMedicineName);
+    document.getElementById("{{ form.price.id_for_label }}").addEventListener("input", validatePrice);
+    document.getElementById("{{ form.content.id_for_label }}").addEventListener("input", validateContent);
+    document.getElementById("{{ form.company_name.id_for_label }}").addEventListener("input", validateCompanyName);
+    document.getElementById("{{ form.medicine_info.id_for_label }}").addEventListener("input", validateMedicineInfo);
+    document.getElementById("{{ form.med_image.id_for_label }}").addEventListener("change", validateImage);
+    document.getElementById("{{ form.quantity.id_for_label }}").addEventListener("input", validateQuantity);
+</script>

@@ -1,0 +1,352 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Clinic</title>
+    <!-- Add your CSS and JavaScript links here -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css" />
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://ehospital.gov.in/ehospitalsso/assets/assets_new_login/img/abha1-1.jpg');
+        }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            margin: 0 10px;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #c1f9e2; /* Light green background color */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Form Styles */
+        .registration-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+
+        .form-group {
+            flex-basis: calc(50% - 15px);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .form-group input[type="file"] {
+            height: 17px; /* Remove the height attribute to match other fields */
+        }
+
+        /* Map Styles */
+        #map-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        /* Adjusted Styles for Alignment */
+        .form-group:last-child {
+            flex-basis: 100%;
+        }
+
+        #location-label {
+            margin-top: 10px;
+        }
+
+        /* Submit Button Style */
+        .submit-button {
+            background-color: #0c2e52;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #810000;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="{% url 'admind' %}">Home</a>
+        <a href="#">Contact</a>
+    </div>
+
+    {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> There are some issues with the form. Please correct them.
+        </div>
+    {% endif %}
+    <!-- Container for Registration Form and Map -->
+    <div class="container">
+        <h2>Add Clinics </h2>
+        <h3>Clinic form</h3>
+
+        <form id="clinic-form" method="post" class="registration-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="clinic_name">Clinic Name:</label>
+                <input type="text" id="clinic_name" name="clinic_name" required>
+                <div class="error-message" id="clinic_name_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_number">Contact Number:</label>
+                <input type="text" id="contact_number" name="contact_number" required>
+                <div class="error-message" id="contact_number_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error-message" id="email_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="speciality">Speciality:</label>
+                <input type="text" id="speciality" name="speciality" required>
+                <div class="error-message" id="speciality_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Image:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+                <div class="error-message" id="image_error"></div>
+            </div>
+
+            <!-- Doctor Selection -->
+            <div class="form-group">
+                <label for="doctors">Doctors:</label>
+                <select id="doctors" name="doctors" multiple>
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Map Container -->
+            <div id="map-container"></div>
+
+            <div class="form-group" id="location-label">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required placeholder="Select from the map">
+                <div class="error-message" id="location_error"></div>
+            </div>
+
+            <!-- Latitude and Longitude Fields -->
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
+            <!-- Submit Button -->
+            <button class="submit-button" type="submit">Submit</button>
+        </form>
+    </div>
+
+
+    <div class="toast-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if success_message %}
+            <ul class="messages">
+                <li class="success">{{ success_message }}</li>
+            </ul>
+        {% endif %}
+    </div>
+
+    <!-- Include Leaflet and Control Geocoder scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+
+    <!-- Add your JavaScript code here -->
+    <script>
+        // Validation functions
+        function validateClinicName() {
+            const clinicNameInput = document.getElementById("clinic_name");
+            const clinicNameError = document.getElementById("clinic_name_error");
+
+            // Validation for clinic name
+            // Example: Clinic name should have the first letter capitalized.
+            const isValid = /^[A-Z][a-zA-Z\s]*$/.test(clinicNameInput.value.trim());
+
+            if (!isValid) {
+                clinicNameError.textContent = "Clinic name should start with a capital letter.";
+            } else {
+                clinicNameError.textContent = "";
+            }
+        }
+
+        function validateContactNumber() {
+            const contactNumberInput = document.getElementById("contact_number");
+            const contactNumberError = document.getElementById("contact_number_error");
+
+            // Validation for contact number
+            // Example: Contact number should have 10 digits and start with 7, 8, or 9.
+            const isValid = /^[7-9][0-9]{9}$/.test(contactNumberInput.value.trim());
+
+            if (!isValid) {
+                contactNumberError.textContent = "Please enter a valid 10-digit contact number starting with 7, 8, or 9.";
+            } else {
+                contactNumberError.textContent = "";
+            }
+        }
+
+        function validateEmail() {
+            const emailInput = document.getElementById("email");
+            const emailError = document.getElementById("email_error");
+
+            // Updated email validation pattern to allow specific extensions
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.in|gmail\.in|mca\.ajce\.org)$/;
+
+            const isValid = emailPattern.test(emailInput.value.trim());
+
+            if (!isValid) {
+                emailError.textContent = "Please enter a valid email address with extensions @gmail.com, @yahoo.in, @gmail.in, @mca.ajce.org.";
+            } else {
+                emailError.textContent = "";
+            }
+        }
+
+        function validateSpeciality() {
+            const specialityInput = document.getElementById("speciality");
+            const specialityError = document.getElementById("speciality_error");
+
+            // Validation for speciality
+            // Example: Speciality should have the first letter capitalized.
+            const isValid = /^[A-Z][a-zA-Z\s]*$/.test(specialityInput.value.trim());
+
+            if (!isValid) {
+                specialityError.textContent = "Speciality should start with a capital letter.";
+            } else {
+                specialityError.textContent = "";
+            }
+        }
+
+        function validateImage() {
+            const imageInput = document.getElementById("image");
+            const imageError = document.getElementById("image_error");
+
+            // Validation for image
+            // Example: Image should not be empty.
+            if (imageInput.files.length === 0) {
+                imageError.textContent = "Please select an image.";
+            } else {
+                imageError.textContent = "";
+            }
+        }
+
+        function validateLocation() {
+            const locationInput = document.getElementById("location");
+            const locationError = document.getElementById("location_error");
+
+            // Validation for location
+            // Example: Location should not be empty.
+            if (locationInput.value.trim() === "") {
+                locationError.textContent = "Please select a location from the map.";
+            } else {
+                locationError.textContent = "";
+            }
+        }
+
+        // Event listeners for input fields
+        document.getElementById("clinic_name").addEventListener("input", validateClinicName);
+        document.getElementById("contact_number").addEventListener("input", validateContactNumber);
+        document.getElementById("email").addEventListener("input", validateEmail);
+        document.getElementById("speciality").addEventListener("input", validateSpeciality);
+        document.getElementById("image").addEventListener("change", validateImage);
+        document.getElementById("location").addEventListener("input", validateLocation);
+    </script> 
+    
+    <!-- Include Leaflet and Control Geocoder scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+
+    <!-- Add your JavaScript code here -->
+    <script>
+        var map = L.map('map-container').setView([10.8505, 76.2711], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Initialize the marker
+        var marker = L.marker([10.8505, 76.2711], {
+            draggable: true
+        }).addTo(map);
+
+        // Add a search control for choosing the location
+        L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            var location = e.geocode.center;
+            map.setView(location, 15);
+            marker.setLatLng(location);
+            document.getElementById('location').value = location.lat + ', ' + location.lng;
+            document.getElementById('latitude').value = location.lat;
+            document.getElementById('longitude').value = location.lng;
+        })
+        .addTo(map);
+
+        // Listen for drag events on the marker
+        marker.on('dragend', function(e) {
+            var coord = e.target.getLatLng();
+            document.getElementById('location').value = coord.lat + ', ' + coord.lng;
+            document.getElementById('latitude').value = coord.lat;
+            document.getElementById('longitude').value = coord.lng;
+        });
+
+        // Listen for map click events to set the marker
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            document.getElementById('location').value = e.latlng.lat + ', ' + e.latlng.lng;
+            document.getElementById('latitude').value = e.latlng.lat;
+            document.getElementById('longitude').value = e.latlng.lng;
+        });
+    </script>
+</body>
+</html>

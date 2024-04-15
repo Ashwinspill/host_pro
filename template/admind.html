@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profiles - Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            padding-left: 250px; /* Add this line to create space for the sidebar */
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 10px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+        }
+
+        .navbar {
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            padding: 20px;
+            margin-left: 250px; /* Adjust to match sidebar width */
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #000;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        /* Style for active users */
+        .active {
+            background-color: green;
+            color: white;
+        }
+
+        /* Style for inactive users */
+        .inactive {
+            background-color: red;
+            color: white;
+        }
+        
+        /* Style for table containers */
+        .table-container {
+            display: block;
+        }
+
+        /* Custom button style */
+        .custom-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        /* Custom button hover effect */
+        .custom-button:hover {
+            background-color: #0056b3;
+        }
+
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    /* Hide default checkbox input */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* The slider (rounded) */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    /* Rounded sliders when checked */
+    .switch input:checked + .slider {
+        background-color: #4CAF50;
+    }
+
+    .switch input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    .switch input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="{% url 'signup' %}" class="custom-button">Registration</a>
+        <a href="{% url 'logout' %}" class="custom-button">Logout</a>
+        <a href="#" onclick="toggleTable('patient-table', 'doctor-table')" class="custom-button">Patient Details</a>
+        <a href="#" onclick="toggleTable('doctor-table', 'patient-table')" class="custom-button">Doctor Details</a>
+        <a href="{% url 'doctor_registration' %}" class="custom-button">Add Doctor</a>
+        <a href="{% url 'add_clinic' %}" class="custom-button">Add Clinic</a>
+        <div class="custom-dropdown">
+            <button class="custom-button dropdown-button">Medicine</button>
+            <div class="custom-dropdown-content">
+                <a href="{% url 'add_medicine' %}">Add Medicine</a>
+                <a href="{% url 'medicine_list' %}">List Medicine</a>
+            </div>
+            <a href="#" onclick="toggleTable('testimonial-table', 'patient-table', 'doctor-table', 'order-table')" class="custom-button">Testimonial Details</a>
+            <a href="#" onclick="toggleTable('order-table', 'patient-table', 'doctor-table', 'testimonial-table')" class="custom-button">Order Details</a>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <h1>Admin Dashboard</h1>
+    </div>
+
+    <!-- Container for patient details table -->
+    <div class="table-container" id="patient-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Role</th>
+                    <th>DOB</th>
+                    <th>User name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_profile in user_profiles %}
+                {% if user_profile.role == "Patient" or user_profile.role == "PATIENT" %}
+                <tr>
+                    <td>{{ user_profile.first_name }}</td>
+                    <td>{{ user_profile.last_name }}</td>
+                    <td>{{ user_profile.role }}</td>
+                    <td>{{ user_profile.dob }}</td>
+                    <td>{{ user_profile.username }}</td>
+                    <td>{{ user_profile.email }}</td>
+                    <td>
+                        <button class="active-toggle-button {% if user_profile.is_active %}active{% else %}inactive{% endif %}" onclick="toggleActive('{{ user_profile.id }}', '{{ user_profile.is_active }}')">
+                            {% if user_profile.is_active %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Container for doctor details table -->
+    <div class="table-container" id="doctor-table" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Role</th>
+                    <th>DOB</th>
+                    <th>User name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_profile in user_profiles %}
+                {% if user_profile.role == "Doctor" or user_profile.role == "DOCTOR" %}
+                <tr>
+                    <td>{{ user_profile.first_name }}</td>
+                    <td>{{ user_profile.last_name }}</td>
+                    <td>{{ user_profile.role }}</td>
+                    <td>{{ user_profile.dob }}</td>
+                    <td>{{ user_profile.username }}</td>
+                    <td>{{ user_profile.email }}</td>
+                    <td>
+                        <button class="active-toggle-button {% if user_profile.is_active %}active{% else %}inactive{% endif %}" onclick="toggleActive('{{ user_profile.id }}', '{{ user_profile.is_active }}')">
+                            {% if user_profile.is_active %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Container for Testimonial details table -->
+   <!-- Display testimonials with sentiment scores -->
+   <div class="table-container" id="testimonial-table" style="display: none;">
+    {% comment %} <div>
+        <button onclick="filterSentiment('positive')">Positive Sentiment</button>
+        <button onclick="filterSentiment('negative')">Negative Sentiment</button>
+    </div> {% endcomment %}
+    
+    <!-- Display testimonials with sentiment scores -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Patient</th>
+                    <th>Rating</th>
+                    <th>Feedback</th>
+                    <th>Sentiment Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for testimonial in filtered_testimonials %}
+                <tr class="{% if testimonial.sentiment_label == 'Positive' %}positive{% elif testimonial.sentiment_label == 'Negative' %}negative{% endif %}">
+                    <td>{{ testimonial.doctor.user.get_full_name }}</td>
+                    <td>{{ testimonial.patient.user.get_full_name }}</td>
+                    <td>{{ testimonial.rating }}</td>
+                    <td>{{ testimonial.feedback }}</td>
+                    <td>{{ testimonial.sentiment_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Container for Order details table -->
+    <div class="table-container" id="order-table" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>Amount Paid</th>
+                    <th>Order Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.patient.user.get_full_name }}</td>
+                    <td>{{ order.medicine.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.amount_paid }}</td>
+                    <td>{{ order.order_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Function to obtain the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Function to toggle active status
+        function toggleActive(userId, isActive) {
+            if (confirm(`Are you sure you want to set this user ${isActive ? 'inactive' : 'active'}?`)) {
+                // Get the CSRF token from the cookie
+                const csrftoken = getCookie('csrftoken');
+        
+                $.ajax({
+                    type: 'POST',
+                    url: `/toggle-active/${userId}/${isActive}/`,
+                    headers: { "X-CSRFToken": csrftoken },
+                    success: function () {
+                        // Update the button text and background color upon successful toggle
+                        const toggleButton = document.querySelector(`button.active-toggle-button[data-user-id="${userId}"]`);
+                        if (toggleButton) {
+                            toggleButton.textContent = isActive ? 'Inactive' : 'Active';
+                            toggleButton.style.backgroundColor = isActive ? 'red' : 'green';
+                            isActive = !isActive;
+                        }
+                    },
+                    error: function () {
+                        alert('Failed to toggle active status.');
+                    }
+                });
+            }
+        }
+
+        // Function to toggle patient and doctor details tables
+        function toggleTable(showTableId, hideTableId) {
+            const showTable = document.getElementById(showTableId);
+            const hideTable = document.getElementById(hideTableId);
+
+            if (showTable && hideTable) {
+                showTable.style.display = 'block';
+                hideTable.style.display = 'none';
+            }
+        }
+
+
+        function getCookie(name) {
+            // Function to obtain the CSRF token from cookies
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        function toggleActive(userId, isActive) {
+            // Function to toggle active status
+            if (confirm(`Are you sure you want to set this user ${isActive ? 'inactive' : 'active'}?`)) {
+                const csrftoken = getCookie('csrftoken');
+    
+                $.ajax({
+                    type: 'POST',
+                    url: `/toggle-active/${userId}/${isActive}/`,
+                    headers: { "X-CSRFToken": csrftoken },
+                    success: function () {
+                        const toggleButton = document.querySelector(`button.active-toggle-button[data-user-id="${userId}"]`);
+                        if (toggleButton) {
+                            toggleButton.textContent = isActive ? 'Inactive' : 'Active';
+                            toggleButton.style.backgroundColor = isActive ? 'red' : 'green';
+                            isActive = !isActive;
+                        }
+                    },
+                    error: function () {
+                        alert('Failed to toggle active status.');
+                    }
+                });
+            }
+        }
+    
+        function toggleTable(showTableId, ...hideTableIds) {
+            // Function to toggle Testimonial and Order details tables
+            const showTable = document.getElementById(showTableId);
+            const hideTables = hideTableIds.map(id => document.getElementById(id));
+    
+            if (showTable && hideTables.every(table => table)) {
+                showTable.style.display = 'block';
+                hideTables.forEach(table => table.style.display = 'none');
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
